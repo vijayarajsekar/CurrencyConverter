@@ -1,4 +1,4 @@
-package demo.currencyconverter.presenter;
+package demo.currencyconverter.Presenter;
 
 import android.content.Context;
 

@@ -1,0 +1,7 @@
+<resources>
+    <dimen name="dimen_5dp">5dp</dimen>
+    <dimen name="dimen_15dp">15dp</dimen>
+
+    <dimen name="dimen_21sp">21sp</dimen>
+
+</resources>

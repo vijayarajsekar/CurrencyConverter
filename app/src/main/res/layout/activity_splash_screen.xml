@@ -5,16 +5,77 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:weightSum="1"
-    tools:context="demo.currencyconverter.SplashScreen">
+    tools:context="demo.currencyconverter.View.HomeScreen">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="0.3"></LinearLayout>
+        android:layout_weight="0.3"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <AutoCompleteTextView
+            android:id="@+id/fromCurrency"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/dimen_15dp"
+            android:backgroundTint="@android:color/transparent"
+            android:ems="10"
+            android:hint="@string/fromcurrency"
+            android:imeOptions="actionNext"
+            android:inputType="textCapWords"
+            android:padding="@dimen/dimen_15dp" />
+
+        <AutoCompleteTextView
+            android:id="@+id/toCurrency"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/dimen_15dp"
+            android:backgroundTint="@android:color/transparent"
+            android:ems="10"
+            android:hint="@string/tocurrency"
+            android:imeOptions="actionNext"
+            android:inputType="textCapWords"
+            android:padding="@dimen/dimen_15dp" />
+
+        <EditText
+            android:id="@+id/textAmount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/dimen_15dp"
+            android:backgroundTint="@android:color/transparent"
+            android:hint="@string/amount"
+            android:inputType="number"
+            android:padding="@dimen/dimen_15dp" />
+
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="0.7"></LinearLayout>
+        android:layout_weight="0.7"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/dimen_5dp"
+            android:gravity="center"
+            android:text="@string/result"
+            android:textSize="@dimen/dimen_21sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/textFinalResult"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/dimen_5dp"
+            android:gravity="center"
+            android:singleLine="true"
+            android:text="10 USD = 650 INR"
+            android:textSize="@dimen/dimen_21sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
 
 </LinearLayout>

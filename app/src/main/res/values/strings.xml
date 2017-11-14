@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">CurrencyConverter</string>
+
+    <string name="fromcurrency">From Currency</string>
+    <string name="tocurrency">To Currency</string>
+    <string name="amount">Enter Amount</string>
+
+    <string name="validdetails">Please Enter Valid Currency</string>
+
+    <string name="nointernet">Please Check Internet Connectivity</string>
+
+    <string name="result">~ Result ~</string>
+
 </resources>
