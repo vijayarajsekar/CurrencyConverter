@@ -36,12 +36,12 @@ public class HomeScreen extends AppCompatActivity implements CurrencyPresenter.C
 
     String mFromCode = null;
     String mToCode = null;
-    String mEnteredAmount;
+    int mEnteredAmount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_splash_screen);
+        setContentView(R.layout.activity_home_screen);
 
         mContext = this;
 
@@ -54,19 +54,22 @@ public class HomeScreen extends AppCompatActivity implements CurrencyPresenter.C
         mAmount.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                mFromCode = mFromCurrency.getText().toString();
-                mToCode = mToCurrency.getText().toString();
+
+                mFromCode = mFromCurrency.getText().toString().trim();
+                mToCode = mToCurrency.getText().toString().trim();
 
                 if (NetworkManager.isNetworkAvailable(mContext)) {
 
-                    if (null != mFromCode || !mFromCode.isEmpty() || null != mToCode || !mToCode.isEmpty()) {
+                    if ((null != mFromCode && mFromCode.length() != 0) && (null != mToCode && mFromCode.length() != 0)) {
 
-                        if (0 != count) {
-                            mEnteredAmount = s.toString();
+                        if (0 != s.length()) {
+                            mEnteredAmount = Integer.parseInt(s.toString());
                             mPresenter.getConvertedCurrency(mFromCode, mToCode);
                         }
 
@@ -100,10 +103,9 @@ public class HomeScreen extends AppCompatActivity implements CurrencyPresenter.C
      */
     @Override
     public void convertedCurrencyResponse(List<LatestCurrencyModel> currencyList) {
-        System.out.println("~ ~ ~ Converted Currency List ~ ~ ~ " + currencyList.get(0).getRates().get(""));
-
-        System.out.println(mEnteredAmount + " " + currencyList.get(0).getBase() + " = " + currencyList.get(0).getRates().get(mToCode) + " " + mFromCode);
-
+        System.out.println("~ ~ ~ Converted Currency List ~ ~ ~ " + currencyList.get(0).getRates().get(mToCode));
+        System.out.println(mEnteredAmount + " " + currencyList.get(0).getBase() + " = " + calculateFinalValue(currencyList.get(0).getRates().get(mToCode).getAsFloat()) + " " + mToCode);
+        mResultAmount.setText(mEnteredAmount + " " + currencyList.get(0).getBase() + " = " + calculateFinalValue(currencyList.get(0).getRates().get(mToCode).getAsFloat()) + " " + mToCode);
     }
 
     private void init() {
@@ -148,5 +150,9 @@ public class HomeScreen extends AppCompatActivity implements CurrencyPresenter.C
         mCurrencyCodeAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, mCurrencyCodes);
         mFromCurrency.setAdapter(mCurrencyCodeAdapter);
         mToCurrency.setAdapter(mCurrencyCodeAdapter);
+    }
+
+    private float calculateFinalValue(float asFloat) {
+        return (float) (Math.floor(asFloat * mEnteredAmount * 100.0) / 100.0);
     }
 }
