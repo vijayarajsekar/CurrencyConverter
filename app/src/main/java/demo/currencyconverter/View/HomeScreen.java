@@ -60,12 +60,14 @@ public class HomeScreen extends AppCompatActivity implements CurrencyPresenter.C
 
         mContext = this;
 
-        // Initializing Variables
         init();
 
-        // Api Call
+        // Api Call - Happening at Presenter
         mPresenter.getLatestCurrency();
 
+        /**
+         * Method is Called When User Enters The Value in Amount Field
+         */
         mAmount.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -131,26 +133,29 @@ public class HomeScreen extends AppCompatActivity implements CurrencyPresenter.C
 
     }
 
+    /**
+     * Initializing Variables
+     */
     private void init() {
 
-        mFromCurrency = (AutoCompleteTextView) findViewById(R.id.fromCurrency);
+        mFromCurrency = findViewById(R.id.fromCurrency);
         mFromCurrency.setThreshold(0);
 
-        mToCurrency = (AutoCompleteTextView) findViewById(R.id.toCurrency);
+        mToCurrency = findViewById(R.id.toCurrency);
         mToCurrency.setThreshold(0);
 
-        mAmount = (TextView) findViewById(R.id.textAmount);
-        mResultAmount = (TextView) findViewById(R.id.textFinalResult);
+        mAmount = findViewById(R.id.textAmount);
+        mResultAmount = findViewById(R.id.textFinalResult);
 
         mCurrencyCodes = new ArrayList<>();
 
         mPresenter = new CurrencyPresenter(this, this);
 
-        mInputLayout = (LinearLayout) findViewById(R.id.layout_input);
-        mResultLayout = (LinearLayout) findViewById(R.id.layout_result);
-        mHistoryLayout = (LinearLayout) findViewById(R.id.layout_history);
+        mInputLayout = findViewById(R.id.layout_input);
+        mResultLayout = findViewById(R.id.layout_result);
+        mHistoryLayout = findViewById(R.id.layout_history);
 
-        mHistoryList = (ListView) findViewById(R.id.history_list);
+        mHistoryList = findViewById(R.id.history_list);
         mHistoryListData = new ArrayList<>();
     }
 
@@ -184,12 +189,24 @@ public class HomeScreen extends AppCompatActivity implements CurrencyPresenter.C
         return (float) (Math.floor(asFloat * mEnteredAmount * 100.0) / 100.0);
     }
 
+    /**
+     * Set Options Menu
+     *
+     * @param menu
+     * @return
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.toolbar_menu, menu);
         return true;
     }
 
+    /**
+     * Menu - Click Event Handling
+     *
+     * @param item
+     * @return
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
@@ -222,6 +239,9 @@ public class HomeScreen extends AppCompatActivity implements CurrencyPresenter.C
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Show - Hide HomeButton - When User Navigating From - To History
+     */
     private void setHomeButtonEnabled(boolean mStatus) {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(mStatus);
@@ -234,6 +254,9 @@ public class HomeScreen extends AppCompatActivity implements CurrencyPresenter.C
         }
     }
 
+    /**
+     * Set History Adapte - When Click On History Menu Option
+     */
     private void setHistoryAdapter() {
         if (null != mHistoryListData && 0 != mHistoryListData.size()) {
             mHistoryList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mHistoryListData));
@@ -242,6 +265,9 @@ public class HomeScreen extends AppCompatActivity implements CurrencyPresenter.C
         }
     }
 
+    /**
+     * Clear The Fields - When Click On Clear Menu Option
+     */
     private void clearFieds() {
         mFromCurrency.setText("");
         mToCurrency.setText("");
