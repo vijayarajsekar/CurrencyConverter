@@ -5,7 +5,9 @@
     <string name="tocurrency">To Currency</string>
     <string name="amount">Enter Amount</string>
 
-    <string name="validdetails">Please Enter Valid Currency</string>
+    <string name="currvalidate">Please Enter Valid Currency</string>
+
+    <string name="samecurr">Choose Different Currency</string>
 
     <string name="nointernet">Please Check Internet Connectivity</string>
 

@@ -54,8 +54,6 @@ public class HomeScreen extends AppCompatActivity implements CurrencyPresenter.C
         mAmount.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-
             }
 
             @Override
@@ -68,13 +66,18 @@ public class HomeScreen extends AppCompatActivity implements CurrencyPresenter.C
 
                     if ((null != mFromCode && mFromCode.length() != 0) && (null != mToCode && mFromCode.length() != 0)) {
 
-                        if (0 != s.length()) {
-                            mEnteredAmount = Integer.parseInt(s.toString());
-                            mPresenter.getConvertedCurrency(mFromCode, mToCode);
+                        if (!mFromCode.equals(mToCode) || !mToCode.equals(mFromCode)) {
+
+                            if (0 != s.length()) {
+                                mEnteredAmount = Integer.parseInt(s.toString());
+                                mPresenter.getConvertedCurrency(mFromCode, mToCode);
+                            }
+                        } else {
+                            NetworkManager.shotToast(getString(R.string.samecurr), mContext);
                         }
 
                     } else {
-                        NetworkManager.shotToast(getString(R.string.validdetails), mContext);
+                        NetworkManager.shotToast(getString(R.string.currvalidate), mContext);
                     }
                 } else {
                     NetworkManager.shotToast(getString(R.string.nointernet), mContext);
