@@ -16,4 +16,6 @@
     <string name="history">History</string>
     <string name="clear">Clear</string>
 
+    <string name="nohistory">No History Data Available</string>
+
 </resources>

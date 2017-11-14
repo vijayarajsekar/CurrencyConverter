@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.gson.JsonObject;
@@ -24,8 +25,11 @@ import demo.currencyconverter.Model.LatestCurrencyModel;
 import demo.currencyconverter.Presenter.CurrencyPresenter;
 import demo.currencyconverter.R;
 import demo.currencyconverter.Utils.NetworkManager;
+import demo.currencyconverter.Utils.ToastUtils;
 
 public class HomeScreen extends AppCompatActivity implements CurrencyPresenter.CountryPresenterListener {
+
+    String TAG = HomeScreen.class.getSimpleName();
 
     private CurrencyPresenter mPresenter;
     private List<String> mCurrencyCodes;
@@ -45,6 +49,9 @@ public class HomeScreen extends AppCompatActivity implements CurrencyPresenter.C
     private LinearLayout mInputLayout;
     private LinearLayout mResultLayout;
     private LinearLayout mHistoryLayout;
+
+    private ListView mHistoryList;
+    private List<String> mHistoryListData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,10 +77,13 @@ public class HomeScreen extends AppCompatActivity implements CurrencyPresenter.C
                 mFromCode = mFromCurrency.getText().toString().trim();
                 mToCode = mToCurrency.getText().toString().trim();
 
+                // For No Internet Connection
                 if (NetworkManager.isNetworkAvailable(mContext)) {
 
+                    // For Invalid / Field Currency is Empty
                     if ((null != mFromCode && mFromCode.length() != 0) && (null != mToCode && mFromCode.length() != 0)) {
 
+                        // For Same Currency
                         if (!mFromCode.equals(mToCode) || !mToCode.equals(mFromCode)) {
 
                             if (0 != s.length()) {
@@ -81,14 +91,14 @@ public class HomeScreen extends AppCompatActivity implements CurrencyPresenter.C
                                 mPresenter.getConvertedCurrency(mFromCode, mToCode);
                             }
                         } else {
-                            NetworkManager.shotToast(getString(R.string.samecurr), mContext);
+                            ToastUtils.shotToast(getString(R.string.samecurr), mContext);
                         }
 
                     } else {
-                        NetworkManager.shotToast(getString(R.string.currvalidate), mContext);
+                        ToastUtils.shotToast(getString(R.string.currvalidate), mContext);
                     }
                 } else {
-                    NetworkManager.shotToast(getString(R.string.nointernet), mContext);
+                    ToastUtils.shotToast(getString(R.string.nointernet), mContext);
                 }
             }
 
@@ -112,9 +122,13 @@ public class HomeScreen extends AppCompatActivity implements CurrencyPresenter.C
      */
     @Override
     public void convertedCurrencyResponse(List<LatestCurrencyModel> currencyList) {
-        System.out.println("~ ~ ~ Converted Currency List ~ ~ ~ " + currencyList.get(0).getRates().get(mToCode));
-        System.out.println(mEnteredAmount + " " + currencyList.get(0).getBase() + " = " + calculateFinalValue(currencyList.get(0).getRates().get(mToCode).getAsFloat()) + " " + mToCode);
+
+        // Displaying The Final Result
         mResultAmount.setText(mEnteredAmount + " " + currencyList.get(0).getBase() + " = " + calculateFinalValue(currencyList.get(0).getRates().get(mToCode).getAsFloat()) + " " + mToCode);
+
+        // Adding Result into History
+        mHistoryListData.add(mResultAmount.getText().toString());
+
     }
 
     private void init() {
@@ -135,6 +149,9 @@ public class HomeScreen extends AppCompatActivity implements CurrencyPresenter.C
         mInputLayout = (LinearLayout) findViewById(R.id.layout_input);
         mResultLayout = (LinearLayout) findViewById(R.id.layout_result);
         mHistoryLayout = (LinearLayout) findViewById(R.id.layout_history);
+
+        mHistoryList = (ListView) findViewById(R.id.history_list);
+        mHistoryListData = new ArrayList<>();
     }
 
     /**
@@ -155,12 +172,14 @@ public class HomeScreen extends AppCompatActivity implements CurrencyPresenter.C
             setAdapter();
     }
 
+    // Set Available Currency Code Values into InputFields
     private void setAdapter() {
         mCurrencyCodeAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, mCurrencyCodes);
         mFromCurrency.setAdapter(mCurrencyCodeAdapter);
         mToCurrency.setAdapter(mCurrencyCodeAdapter);
     }
 
+    // Final Calculation Based On Given Currency Details
     private float calculateFinalValue(float asFloat) {
         return (float) (Math.floor(asFloat * mEnteredAmount * 100.0) / 100.0);
     }
@@ -186,7 +205,6 @@ public class HomeScreen extends AppCompatActivity implements CurrencyPresenter.C
             mInputLayout.setVisibility(View.VISIBLE);
             mResultLayout.setVisibility(View.VISIBLE);
             mHistoryLayout.setVisibility(View.GONE);
-
         }
 
         if (id == R.id.action_history) {
@@ -195,6 +213,8 @@ public class HomeScreen extends AppCompatActivity implements CurrencyPresenter.C
             mInputLayout.setVisibility(View.GONE);
             mResultLayout.setVisibility(View.GONE);
             mHistoryLayout.setVisibility(View.VISIBLE);
+
+            setHistoryAdapter();
 
             return true;
         }
@@ -211,6 +231,14 @@ public class HomeScreen extends AppCompatActivity implements CurrencyPresenter.C
             getSupportActionBar().setTitle(getString(R.string.history));
         } else {
             getSupportActionBar().setTitle(R.string.app_name);
+        }
+    }
+
+    private void setHistoryAdapter() {
+        if (null != mHistoryListData && 0 != mHistoryListData.size()) {
+            mHistoryList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mHistoryListData));
+        } else {
+            ToastUtils.shotToast(getString(R.string.nohistory), mContext);
         }
     }
 

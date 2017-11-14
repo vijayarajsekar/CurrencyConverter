@@ -4,7 +4,6 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
-import android.widget.Toast;
 
 /**
  * Created by vijayaraj_s on 11/14/2017.
@@ -28,9 +27,5 @@ public class NetworkManager {
             Log.e(TAG, ex.getMessage().toString());
             return false;
         }
-    }
-
-    public static void shotToast(String msg, Context context) {
-        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
     }
 }
