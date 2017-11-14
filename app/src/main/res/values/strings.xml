@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">CurrencyConverter</string>
+    <string name="app_name">Currency Converter</string>
 
     <string name="fromcurrency">From Currency</string>
     <string name="tocurrency">To Currency</string>
@@ -12,5 +12,8 @@
     <string name="nointernet">Please Check Internet Connectivity</string>
 
     <string name="result">~ Result ~</string>
+
+    <string name="history">History</string>
+    <string name="clear">Clear</string>
 
 </resources>

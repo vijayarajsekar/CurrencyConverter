@@ -5,8 +5,12 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.gson.JsonObject;
@@ -34,9 +38,13 @@ public class HomeScreen extends AppCompatActivity implements CurrencyPresenter.C
     private TextView mResultAmount;
     private ArrayAdapter<String> mCurrencyCodeAdapter;
 
-    String mFromCode = null;
-    String mToCode = null;
-    int mEnteredAmount;
+    private String mFromCode = null;
+    private String mToCode = null;
+    private int mEnteredAmount;
+
+    private LinearLayout mInputLayout;
+    private LinearLayout mResultLayout;
+    private LinearLayout mHistoryLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,8 +103,6 @@ public class HomeScreen extends AppCompatActivity implements CurrencyPresenter.C
      */
     @Override
     public void latestCurrencyResponse(List<LatestCurrencyModel> currencyList) {
-        System.out.println("~ ~ ~ Currency List ~ ~ ~ " + currencyList.get(0).getRates().get("AUD"));
-
         if (0 != currencyList.get(0).getRates().size())
             getCurrencyCodes(currencyList.get(0).getRates());
     }
@@ -126,6 +132,9 @@ public class HomeScreen extends AppCompatActivity implements CurrencyPresenter.C
 
         mPresenter = new CurrencyPresenter(this, this);
 
+        mInputLayout = (LinearLayout) findViewById(R.id.layout_input);
+        mResultLayout = (LinearLayout) findViewById(R.id.layout_result);
+        mHistoryLayout = (LinearLayout) findViewById(R.id.layout_history);
     }
 
     /**
@@ -133,17 +142,14 @@ public class HomeScreen extends AppCompatActivity implements CurrencyPresenter.C
      */
     private void getCurrencyCodes(JsonObject rates) {
 
-        Set<?> s = rates.keySet();
-        Iterator<?> i = s.iterator();
+        Set<?> mSet = rates.keySet();
+        Iterator<?> i = mSet.iterator();
         do {
 
-            String k = i.next().toString();
-            System.out.println("~ ~ ~ KEYS " + k);
-            mCurrencyCodes.add(k);
+            String mKeys = i.next().toString();
+            mCurrencyCodes.add(mKeys);
 
         } while (i.hasNext());
-
-        System.out.println("~ ~ ~ CurrencyCode List Size ~ ~ ~ " + mCurrencyCodes.size());
 
         if (0 != mCurrencyCodes.size())
             setAdapter();
@@ -157,5 +163,61 @@ public class HomeScreen extends AppCompatActivity implements CurrencyPresenter.C
 
     private float calculateFinalValue(float asFloat) {
         return (float) (Math.floor(asFloat * mEnteredAmount * 100.0) / 100.0);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        int id = item.getItemId();
+
+        if (id == R.id.action_clear) {
+            clearFieds();
+            return true;
+        } else if (id == android.R.id.home) {
+            clearFieds();
+            setHomeButtonEnabled(false);
+
+            mInputLayout.setVisibility(View.VISIBLE);
+            mResultLayout.setVisibility(View.VISIBLE);
+            mHistoryLayout.setVisibility(View.GONE);
+
+        }
+
+        if (id == R.id.action_history) {
+            setHomeButtonEnabled(true);
+
+            mInputLayout.setVisibility(View.GONE);
+            mResultLayout.setVisibility(View.GONE);
+            mHistoryLayout.setVisibility(View.VISIBLE);
+
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void setHomeButtonEnabled(boolean mStatus) {
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(mStatus);
+        getSupportActionBar().setHomeButtonEnabled(mStatus);
+
+        if (mStatus) {
+            getSupportActionBar().setTitle(getString(R.string.history));
+        } else {
+            getSupportActionBar().setTitle(R.string.app_name);
+        }
+    }
+
+    private void clearFieds() {
+        mFromCurrency.setText("");
+        mToCurrency.setText("");
+        mAmount.setText("");
+        mResultAmount.setText("");
     }
 }

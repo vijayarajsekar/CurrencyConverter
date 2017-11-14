@@ -8,11 +8,13 @@
     tools:context="demo.currencyconverter.View.HomeScreen">
 
     <LinearLayout
+        android:id="@+id/layout_input"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="0.3"
         android:gravity="center"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="visible">
 
         <AutoCompleteTextView
             android:id="@+id/fromCurrency"
@@ -51,10 +53,12 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/layout_result"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="0.7"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="visible">
 
         <TextView
             android:layout_width="match_parent"
@@ -74,6 +78,22 @@
             android:singleLine="true"
             android:textSize="@dimen/dimen_15sp"
             android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_history"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <ListView
+            android:id="@+id/history_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/white"
+            android:divider="@null"></ListView>
 
     </LinearLayout>
 
