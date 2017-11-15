@@ -17,6 +17,8 @@ import android.widget.TextView;
 import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -24,6 +26,7 @@ import java.util.Set;
 import demo.currencyconverter.Model.LatestCurrencyModel;
 import demo.currencyconverter.Presenter.CurrencyPresenter;
 import demo.currencyconverter.R;
+import demo.currencyconverter.Singleton;
 import demo.currencyconverter.Utils.NetworkManager;
 import demo.currencyconverter.Utils.ToastUtils;
 
@@ -53,13 +56,22 @@ public class HomeScreen extends AppCompatActivity implements CurrencyPresenter.C
     private ListView mHistoryList;
     private List<String> mHistoryListData;
 
+    private boolean isThemeChanged = false;
+
+    private boolean isMenushowing = true;
+
+    private StringBuilder mHistoryBuilder;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Set Initial Theme
+        setThemes();
+
         setContentView(R.layout.activity_home_screen);
 
         mContext = this;
-
         init();
 
         // Api Call - Happening at Presenter
@@ -80,7 +92,7 @@ public class HomeScreen extends AppCompatActivity implements CurrencyPresenter.C
                 mToCode = mToCurrency.getText().toString().trim();
 
                 // For No Internet Connection
-                if (NetworkManager.isNetworkAvailable(mContext)) {
+                if (NetworkManager.isNetworkAvailable()) {
 
                     // For Invalid / Field Currency is Empty
                     if ((null != mFromCode && mFromCode.length() != 0) && (null != mToCode && mFromCode.length() != 0)) {
@@ -93,14 +105,14 @@ public class HomeScreen extends AppCompatActivity implements CurrencyPresenter.C
                                 mPresenter.getConvertedCurrency(mFromCode, mToCode);
                             }
                         } else {
-                            ToastUtils.shotToast(getString(R.string.samecurr), mContext);
+                            ToastUtils.shotToast(getString(R.string.samecurr));
                         }
 
                     } else {
-                        ToastUtils.shotToast(getString(R.string.currvalidate), mContext);
+                        ToastUtils.shotToast(getString(R.string.currvalidate));
                     }
                 } else {
-                    ToastUtils.shotToast(getString(R.string.nointernet), mContext);
+                    ToastUtils.shotToast(getString(R.string.nointernet));
                 }
             }
 
@@ -129,8 +141,11 @@ public class HomeScreen extends AppCompatActivity implements CurrencyPresenter.C
         mResultAmount.setText(mEnteredAmount + " " + currencyList.get(0).getBase() + " = " + calculateFinalValue(currencyList.get(0).getRates().get(mToCode).getAsFloat()) + " " + mToCode);
 
         // Adding Result into History
-        mHistoryListData.add(mResultAmount.getText().toString());
-
+        if (Singleton.getPreferenceInstance().getHistory().isEmpty()) {
+            Singleton.getPreferenceInstance().setHistory(mHistoryBuilder.append(mResultAmount.getText().toString() + ",").toString());
+        } else {
+            Singleton.getPreferenceInstance().setHistory(mHistoryBuilder.append(Singleton.getPreferenceInstance().getHistory() + mResultAmount.getText().toString() + ",").toString());
+        }
     }
 
     /**
@@ -156,7 +171,7 @@ public class HomeScreen extends AppCompatActivity implements CurrencyPresenter.C
         mHistoryLayout = findViewById(R.id.layout_history);
 
         mHistoryList = findViewById(R.id.history_list);
-        mHistoryListData = new ArrayList<>();
+        mHistoryBuilder = new StringBuilder();
     }
 
     /**
@@ -197,7 +212,8 @@ public class HomeScreen extends AppCompatActivity implements CurrencyPresenter.C
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+        if (isMenushowing)
+            getMenuInflater().inflate(R.menu.toolbar_menu, menu);
         return true;
     }
 
@@ -216,6 +232,9 @@ public class HomeScreen extends AppCompatActivity implements CurrencyPresenter.C
             clearFieds();
             return true;
         } else if (id == android.R.id.home) {
+
+            invalidateMenu(true);
+
             clearFieds();
             setHomeButtonEnabled(false);
 
@@ -225,6 +244,9 @@ public class HomeScreen extends AppCompatActivity implements CurrencyPresenter.C
         }
 
         if (id == R.id.action_history) {
+
+            invalidateMenu(false);
+
             setHomeButtonEnabled(true);
 
             mInputLayout.setVisibility(View.GONE);
@@ -232,6 +254,28 @@ public class HomeScreen extends AppCompatActivity implements CurrencyPresenter.C
             mHistoryLayout.setVisibility(View.VISIBLE);
 
             setHistoryAdapter();
+
+            return true;
+        }
+
+        if (id == R.id.action_changetheme) {
+
+            if (!Singleton.getPreferenceInstance().getTheme()) {
+                isThemeChanged = true;
+            } else {
+                isThemeChanged = false;
+            }
+
+            // Set User Selected Theme into Shared Preferences
+            Singleton.getPreferenceInstance().setTheme(isThemeChanged);
+
+            // Set Theme Based on User Selection
+            setThemes();
+
+            // Recreate The Activity Instance
+            this.recreate();
+
+            clearFieds();
 
             return true;
         }
@@ -258,10 +302,13 @@ public class HomeScreen extends AppCompatActivity implements CurrencyPresenter.C
      * Set History Adapte - When Click On History Menu Option
      */
     private void setHistoryAdapter() {
+
+        mHistoryListData = new ArrayList<>(new HashSet<>(Arrays.asList(Singleton.getPreferenceInstance().getHistory().split("\\s*,\\s*"))));
+
         if (null != mHistoryListData && 0 != mHistoryListData.size()) {
             mHistoryList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mHistoryListData));
         } else {
-            ToastUtils.shotToast(getString(R.string.nohistory), mContext);
+            ToastUtils.shotToast(getString(R.string.nohistory));
         }
     }
 
@@ -273,5 +320,21 @@ public class HomeScreen extends AppCompatActivity implements CurrencyPresenter.C
         mToCurrency.setText("");
         mAmount.setText("");
         mResultAmount.setText("");
+    }
+
+    /**
+     * Change App Theme Based On User Selection
+     */
+    private void setThemes() {
+        if (null != Singleton.getPreferenceInstance()) {
+            setTheme(Singleton.getPreferenceInstance().getTheme() ? R.style.AppThemeTwo : R.style.AppThemeOne);
+        } else {
+            setTheme(R.style.AppThemeOne);
+        }
+    }
+
+    private void invalidateMenu(boolean isEnabled) {
+        isMenushowing = isEnabled;
+        invalidateOptionsMenu();
     }
 }
